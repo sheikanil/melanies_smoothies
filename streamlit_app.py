@@ -30,8 +30,12 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
         fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit_chosen}")
-        fv_df = st.dataframe(data=fruityvice_response.json(), use_container_width=True)
-        st.image(fv_df['image_url'], caption=fruit_chosen)  # Assuming 'image_url' is a key in the response JSON
+        fv_data = fruityvice_response.json()
+        st.write(fv_data)  # Display the API response to inspect its structure
+
+        # If API response contains image URL, display it, else use placeholder
+        image_url = fv_data.get('image_url', 'https://via.placeholder.com/150')
+        st.image(image_url, caption=fruit_chosen)
 
     ingredients_string = ingredients_string.strip()  # Remove trailing space
     my_insert_stmt = f"""
@@ -45,6 +49,3 @@ if ingredients_list:
     if time_to_insert:
         session.sql(my_insert_stmt).collect()
         st.success(f"Your Smoothie is ordered! {name_on_order}", icon="✅")
-
-
-
